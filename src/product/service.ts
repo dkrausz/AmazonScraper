@@ -1,20 +1,13 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-
-//const URL =
-  "https://www.amazon.se/-/en/gp/product/B0CY5GTPQC/ref=ox_sc_saved_title_1?smid=ANU9KP01APNAG&psc=1";
-
- // const URL = "https://www.amazon.se/-/en/gp/product/B07L3JZD6D/ref=ewc_pr_img_1?smid=ANU9KP01APNAG&psc=1";
-
-type Tproduct={title?:string,
-                photo?:string,
-                price?:string // em breve um int
-}
+import { prisma } from "../database/prisma";
+import { TCreateProduct, TFindproduct } from "./interfaces";
+import { returnRegisteredProduct, returnSearchProduct } from "./schemas";
 
 class ProductService{
 
-    public create= async(URL:string)=>{
-        const product:Tproduct={};
+    public findProduct= async(URL:string)=>{
+        const product:TFindproduct={};
         const response = await axios(URL);
         const html = response.data;
         const $ = cheerio.load(html); 
@@ -33,12 +26,69 @@ class ProductService{
             
                
         })
-        product.photo=$img.attr("src");
-        product.price=totalPrice;
-        product.title=$itemName.text().trim();
-        return product;
+        product.photo=$img.attr("src");    
+        totalPrice=totalPrice.replace(",","");     
+        product.price=Math.round(Number(totalPrice)*100); 
+        product.name=$itemName.text().trim();
+      
+        console.log(totalPrice);
+        console.log(Number(totalPrice));
+        
+        return returnSearchProduct.parse(product);
           
 
+    };
+
+    public addProduct= async(URL:string, userId:string, name?:string)=>{
+       
+        const response = await axios(URL);
+        const html = response.data;
+        const $ = cheerio.load(html); 
+        const $itemName = $("#productTitle");
+        const $divBox = $("div.a-section.a-spacing-micro");  
+        const $img = $("#imgTagWrapperId > img");
+
+        let totalPrice='';
+        $divBox.each(function(){ 
+            const price = $(this).find(".a-price-whole").text();
+            const priceParcel = $(this).find(".a-price-fraction").text();
+           if (price && priceParcel) {
+                totalPrice = `${price}${priceParcel}`;
+                return false; 
+              }
+            
+               
+        })
+        const productPhoto=$img.attr("src") as string;
+        const productPrice=totalPrice.replace(",","");
+        let productName;
+        if(name)
+        {
+            productName=name;
+        }else{
+            productName=$itemName.text().trim();
+
+        }
+
+      
+        const product={
+            name:productName,
+            photo: productPhoto,
+            URL:URL,
+            userId:userId  
+        };
+        const registeredProduct = await prisma.product.create({data:product});
+
+        const date = new Date();
+        const price =Math.round(Number(totalPrice)*100);       
+        const registeredPrice = await prisma.price.create({data:{date:date,price:price,productId: registeredProduct.id}})
+
+        const newProduct = await prisma.product.findFirst({where:{id:registeredProduct.id},include:{price:true}});
+       
+        console.log(newProduct);
+        
+        return returnRegisteredProduct.parse(newProduct);
+              
     };
     
 };

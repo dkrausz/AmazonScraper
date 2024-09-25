@@ -1,18 +1,19 @@
 import { Request, Response } from "express";
 import { productService } from "./service";
+import { TreturnBody } from "./interfaces";
 
 class ProductController{
 
 
-    public create=async(req:Request ,res:Response)=>{
-        console.log("to aqui");
-        
-        //  console.log(req);
-        console.log(req.body);
-    const product = await productService.create(req.body.URL);
+    public findProduct=async(req:Request ,res:Response)=>{              
+    const product = await productService.findProduct(req.body.URL);       
     
-
         return res.status(200).json(product)
+    }
+
+    public addProduct = async (req:Request, res:Response):Promise<Response<TreturnBody>>=>{
+        const product = await productService.addProduct(req.body.URL,"2111c31e-ce90-43e4-983e-d040557198bd",req.body.name);
+        return res.status(201).json(product)
     }
 
 }
