@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.productRoute = void 0;
+const express_1 = require("express");
+const controller_1 = require("./controller");
+const body_middleware_1 = require("../@shared/body.middleware");
+const schemas_1 = require("./schemas");
+const existId_middleware_1 = require("../@shared/existId.middleware");
+const validadeToken_middleware_1 = require("../@shared/validadeToken.middleware");
+exports.productRoute = (0, express_1.Router)();
+exports.productRoute.post("/", body_middleware_1.bodyMiddleware.bodyIsValid(schemas_1.findProductBodySchema), controller_1.productController.findProduct);
+exports.productRoute.post("/add", validadeToken_middleware_1.validadeToken.validadeToken, body_middleware_1.bodyMiddleware.bodyIsValid(schemas_1.findProductBodySchema), controller_1.productController.addProduct);
+exports.productRoute.get("/", validadeToken_middleware_1.validadeToken.validadeToken, controller_1.productController.getProducts);
+exports.productRoute.delete("/:id", validadeToken_middleware_1.validadeToken.validadeToken, existId_middleware_1.existId.existId, controller_1.productController.deleteItem);
