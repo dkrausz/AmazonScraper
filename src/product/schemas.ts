@@ -14,9 +14,9 @@ const returnSearchProduct = z.object({
     photo: z.string().min(1),
     name:z.string().min(1),
     price:z.number()
-}).partial();
+});
 
-const findProductBodySchema =productSchema.pick({URL:true});
+const findProductBodySchema =productSchema.pick({URL:true , name:true}).partial();
 
 const createProductBodyScherma = productSchema.omit({id:true, userId:true});
 
@@ -25,7 +25,9 @@ const priceSchema = z.object({
     price:z.number(),
     productId:z.string().min(1),
     date:z.date()
-})
+});
+
+const createPriceBodySchema = priceSchema.omit({id:true});
 const returnRegisteredProduct=productSchema.extend({price:priceSchema.omit({id:true}).array()});
 
-export{productSchema,priceSchema,returnSearchProduct,findProductBodySchema,createProductBodyScherma,returnRegisteredProduct};
+export{productSchema,priceSchema,returnSearchProduct,findProductBodySchema,createProductBodyScherma,returnRegisteredProduct, createPriceBodySchema};

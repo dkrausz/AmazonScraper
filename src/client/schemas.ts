@@ -10,4 +10,6 @@ const clientSchema = z.object({
 const createClientbodySchema = clientSchema.omit({id:true});
 const returnCreateClientSchema = clientSchema.omit({password:true});
 
-export{clientSchema,createClientbodySchema,returnCreateClientSchema};
+const loginSchemaBody = clientSchema.pick({email:true, password:true});
+
+export{clientSchema,createClientbodySchema,returnCreateClientSchema,loginSchemaBody};
