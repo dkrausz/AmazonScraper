@@ -21,8 +21,7 @@ class ProductController{
     public getProducts = async(req:Request, res:Response) =>{
 
         const userId = res.locals.token.sub;
-        console.log(userId);
-        
+                
         const products = await productService.getAllProducts(userId);
 
         return res.status(200).json(products);

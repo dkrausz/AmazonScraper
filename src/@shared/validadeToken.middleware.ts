@@ -5,10 +5,7 @@ import { verify } from "jsonwebtoken";
 class ValidadeToken {
   public validadeToken = (req: Request, res: Response, next: NextFunction) => {
     const authorization = req.headers.authorization;
-    const jwtKey = process.env.JWT_SECRET as string;
-
-    console.log(authorization);
-    
+    const jwtKey = process.env.JWT_SECRET as string;    
 
     if (!authorization) {
         throw new AppError(401, "Token is required.");
