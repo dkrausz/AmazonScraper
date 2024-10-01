@@ -88,6 +88,8 @@ class ProductService {
   };
 
   public updatePrices = async () => {
+    console.log("updating prices...");
+    
     const products = await prisma.product.findMany({
       include: { price: true },
     });
