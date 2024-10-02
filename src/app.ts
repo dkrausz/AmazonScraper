@@ -13,7 +13,7 @@ app.use("/product",productRoute);
 app.use("/client",clientRouter);
 app.use(HandleErrors.execute);
 
-const uptadatePrices=  cron.schedule('* */12 * * *', async () => {
+const uptadatePrices=  cron.schedule('0 */12 * * *', async () => {
     await productService.updatePrices();
     
   });
